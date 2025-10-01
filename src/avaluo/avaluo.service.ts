@@ -11,29 +11,45 @@ export class AvaluoService {
     @InjectModel(Avaluo.name) private avaluoModel: Model<Avaluo>,
   ) {}
 
-  async create(createAvaluoDto: CreateAvaluoDto): Promise<Avaluo> {
+  async create(createAvaluoDto: CreateAvaluoDto, usuarioId: string): Promise<Avaluo> {
     try {
-      const createdAvaluo = new this.avaluoModel(createAvaluoDto);
+      const createdAvaluo = new this.avaluoModel({
+        ...createAvaluoDto,
+        usuarioId,
+      });
       return await createdAvaluo.save();
     } catch (error) {
       throw new BadRequestException('Error al crear el avalúo');
     }
   }
 
-  async findAll(): Promise<Avaluo[]> {
+  async findAll(userId?: string, roles?: string[]): Promise<Avaluo[]> {
     try {
-      return await this.avaluoModel.find().exec();
+      let query = {};
+
+      // Si no es admin, solo mostrar avaluos del usuario
+      if (!roles?.includes('admin')) {
+        query = { usuarioId: userId };
+      }
+
+      return await this.avaluoModel.find(query).populate('usuarioId', 'nombre email').exec();
     } catch (error) {
       throw new BadRequestException('Error al obtener los avaluos');
     }
   }
 
-  async findOne(id: string): Promise<Avaluo> {
+  async findOne(id: string, userId?: string, roles?: string[]): Promise<Avaluo> {
     try {
-      const avaluo = await this.avaluoModel.findById(id).exec();
+      const avaluo = await this.avaluoModel.findById(id).populate('usuarioId', 'nombre email').exec();
       if (!avaluo) {
         throw new NotFoundException('Avalúo no encontrado');
       }
+
+      // Verificar permisos: solo el creador o admin pueden ver el avalúo
+      if (!roles?.includes('admin') && avaluo.usuarioId.toString() !== userId) {
+        throw new NotFoundException('Avalúo no encontrado');
+      }
+
       return avaluo;
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -43,15 +59,21 @@ export class AvaluoService {
     }
   }
 
-  async update(id: string, updateAvaluoDto: UpdateAvaluoDto): Promise<Avaluo> {
+  async update(id: string, updateAvaluoDto: UpdateAvaluoDto, userId?: string, roles?: string[]): Promise<Avaluo> {
     try {
       const existingAvaluo = await this.avaluoModel.findById(id);
       if (!existingAvaluo) {
         throw new NotFoundException('Avalúo no encontrado');
       }
 
+      // Verificar permisos: solo el creador o admin pueden actualizar
+      if (!roles?.includes('admin') && existingAvaluo.usuarioId.toString() !== userId) {
+        throw new NotFoundException('Avalúo no encontrado');
+      }
+
       const updatedAvaluo = await this.avaluoModel
         .findByIdAndUpdate(id, updateAvaluoDto, { new: true })
+        .populate('usuarioId', 'nombre email')
         .exec();
 
       return updatedAvaluo;
@@ -63,12 +85,19 @@ export class AvaluoService {
     }
   }
 
-  async remove(id: string): Promise<Avaluo> {
+  async remove(id: string, userId?: string, roles?: string[]): Promise<Avaluo> {
     try {
-      const deletedAvaluo = await this.avaluoModel.findByIdAndDelete(id).exec();
-      if (!deletedAvaluo) {
+      const avaluoToDelete = await this.avaluoModel.findById(id);
+      if (!avaluoToDelete) {
         throw new NotFoundException('Avalúo no encontrado');
       }
+
+      // Verificar permisos: solo el creador o admin pueden eliminar
+      if (!roles?.includes('admin') && avaluoToDelete.usuarioId.toString() !== userId) {
+        throw new NotFoundException('Avalúo no encontrado');
+      }
+
+      const deletedAvaluo = await this.avaluoModel.findByIdAndDelete(id).populate('usuarioId', 'nombre email').exec();
       return deletedAvaluo;
     } catch (error) {
       if (error instanceof NotFoundException) {

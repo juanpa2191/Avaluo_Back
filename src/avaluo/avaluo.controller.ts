@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, UsePipes, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, UsePipes, UseGuards, Request } from '@nestjs/common';
 import { AvaluoService } from './avaluo.service';
 import { CreateAvaluoDto } from './dto/create-avaluo.dto';
 import { UpdateAvaluoDto } from './dto/update-avaluo.dto';
@@ -16,31 +16,31 @@ export class AvaluoController {
 
   @Post()
   @Roles('admin', 'avaluador')
-  create(@Body() createAvaluoDto: CreateAvaluoDto) {
-    return this.avaluoService.create(createAvaluoDto);
+  create(@Body() createAvaluoDto: CreateAvaluoDto, @Request() req) {
+    return this.avaluoService.create(createAvaluoDto, req.user.userId);
   }
 
   @Get()
   @Roles('admin', 'avaluador', 'usuario')
-  findAll() {
-    return this.avaluoService.findAll();
+  findAll(@Request() req) {
+    return this.avaluoService.findAll(req.user.userId, req.user.roles);
   }
 
   @Get(':id')
   @Roles('admin', 'avaluador', 'usuario')
-  findOne(@Param('id') id: string) {
-    return this.avaluoService.findOne(id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.avaluoService.findOne(id, req.user.userId, req.user.roles);
   }
 
   @Patch(':id')
   @Roles('admin', 'avaluador')
-  update(@Param('id') id: string, @Body() updateAvaluoDto: UpdateAvaluoDto) {
-    return this.avaluoService.update(id, updateAvaluoDto);
+  update(@Param('id') id: string, @Body() updateAvaluoDto: UpdateAvaluoDto, @Request() req) {
+    return this.avaluoService.update(id, updateAvaluoDto, req.user.userId, req.user.roles);
   }
 
   @Delete(':id')
   @Roles('admin')
-  remove(@Param('id') id: string) {
-    return this.avaluoService.remove(id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.avaluoService.remove(id, req.user.userId, req.user.roles);
   }
 }

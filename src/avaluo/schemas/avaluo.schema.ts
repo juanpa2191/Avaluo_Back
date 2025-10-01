@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 // Subesquemas para objetos anidados
 
@@ -551,6 +551,9 @@ export class Avaluo extends Document {
 
   @Prop({ type: [ImagenInmuebleSchema] })
   imagenesInmueble: ImagenInmueble[];
+
+  @Prop({ type: Types.ObjectId, ref: 'Usuario', required: true })
+  usuarioId: Types.ObjectId;
 }
 
 export const AvaluoSchema = SchemaFactory.createForClass(Avaluo);
