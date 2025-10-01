@@ -27,12 +27,12 @@ graph TB
     C --> E[Avaluo Module]
     E --> E1[Avaluo Controller]
     E --> E2[Avaluo Service]
-    E --> E3[Avaluo Schema (Mongoose)]
+    E --> E3[Avaluo Schema]
 
     C --> F[Usuario Module]
     F --> F1[Usuario Controller]
     F --> F2[Usuario Service]
-    F --> F3[Usuario Schema (Mongoose)]
+    F --> F3[Usuario Schema]
 
     C --> G[Cloudinary Module]
     G --> G1[Cloudinary Service]
@@ -40,10 +40,10 @@ graph TB
     C --> H[Database Module]
     H --> I[MongoDB Connection]
 
-    E2 --> J[DTOs: CreateAvaluoDto, UpdateAvaluoDto]
-    F2 --> K[DTOs: CreateUsuarioDto, UpdateUsuarioDto]
+    E2 --> J[DTOs]
+    F2 --> K[DTOs]
 
-    C --> L[Logging Module (Winston)]
+    C --> L[Logging Module]
 
     I --> M[(MongoDB)]
     M --> N[Avaluo Collection]
