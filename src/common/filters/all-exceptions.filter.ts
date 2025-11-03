@@ -51,6 +51,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
           error = 'Database Error';
       }
     } else if (exception instanceof Error) {
+      // Ignorar errores de rutas no encontradas para recursos estáticos comunes
+      if (exception.message.includes('Cannot GET /favicon.ico') ||
+          exception.message.includes('Cannot GET /robots.txt') ||
+          exception.message.includes('Cannot GET /manifest.json')) {
+        response.status(404).json({
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+          path: request.url,
+          method: request.method,
+          error: 'Not Found',
+          message: 'Resource not found',
+        });
+        return;
+      }
       message = exception.message;
     }
 
