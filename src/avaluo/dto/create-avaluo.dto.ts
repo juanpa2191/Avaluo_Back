@@ -569,15 +569,15 @@ class CreateImagenInmuebleDto {
 class CreateInformacionGeneralDto {
   @IsOptional()
   @IsString()
-  fechaEntrega?: string;
+  fechaInspeccion?: string;
 
   @IsOptional()
   @IsString()
-  fechaVisita?: string;
+  fechaInforme?: string;
 
   @IsOptional()
   @IsString()
-  vigenciaAvaluo?: string;
+  vigenciaInforme?: string;
 
   @IsOptional()
   @IsString()

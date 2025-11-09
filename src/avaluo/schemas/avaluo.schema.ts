@@ -495,13 +495,13 @@ export class ImagenInmueble {
 @Schema()
 export class InformacionGeneral {
   @Prop()
-  fechaEntrega: string;
+  fechaInspeccion: string;
 
   @Prop()
-  fechaVisita: string;
+  fechaInforme: string;
 
   @Prop()
-  vigenciaAvaluo: string;
+  vigenciaInforme: string;
 
   @Prop()
   solicitante: string;
